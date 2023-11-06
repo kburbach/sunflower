@@ -28,10 +28,15 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,10 +70,15 @@ fun GardenScreen(
     onPlantClick: (PlantAndGardenPlantings) -> Unit
 ) {
     val gardenPlants by viewModel.plantAndGardenPlantings.collectAsState(initial = emptyList())
+    val removePlant: (PlantAndGardenPlantings) -> Unit = { plant ->
+        viewModel.removeFromGarden(plant)
+    }
+
     GardenScreen(
         gardenPlants = gardenPlants,
         modifier = modifier,
         onAddPlantClick = onAddPlantClick,
+        onRemovePlantClick = removePlant,
         onPlantClick = onPlantClick
     )
 }
@@ -78,12 +88,18 @@ fun GardenScreen(
     gardenPlants: List<PlantAndGardenPlantings>,
     modifier: Modifier = Modifier,
     onAddPlantClick: () -> Unit = {},
+    onRemovePlantClick: (PlantAndGardenPlantings) -> Unit = {},
     onPlantClick: (PlantAndGardenPlantings) -> Unit = {}
 ) {
     if (gardenPlants.isEmpty()) {
         EmptyGarden(onAddPlantClick, modifier)
     } else {
-        GardenList(gardenPlants = gardenPlants, onPlantClick = onPlantClick, modifier = modifier)
+        GardenList(
+            gardenPlants = gardenPlants,
+            onPlantClick = onPlantClick,
+            onRemovePlantClick = onRemovePlantClick,
+            modifier = modifier
+        )
     }
 }
 
@@ -91,6 +107,7 @@ fun GardenScreen(
 private fun GardenList(
     gardenPlants: List<PlantAndGardenPlantings>,
     onPlantClick: (PlantAndGardenPlantings) -> Unit,
+    onRemovePlantClick: (PlantAndGardenPlantings) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // Call reportFullyDrawn when the garden list has been rendered
@@ -109,7 +126,11 @@ private fun GardenList(
             items = gardenPlants,
             key = { it.plant.plantId }
         ) {
-            GardenListItem(plant = it, onPlantClick = onPlantClick)
+            GardenListItem(
+                plant = it,
+                onPlantClick = onPlantClick,
+                onRemovePlantClick = onRemovePlantClick
+            )
         }
     }
 }
@@ -120,7 +141,8 @@ private fun GardenList(
 @Composable
 private fun GardenListItem(
     plant: PlantAndGardenPlantings,
-    onPlantClick: (PlantAndGardenPlantings) -> Unit
+    onPlantClick: (PlantAndGardenPlantings) -> Unit,
+    onRemovePlantClick: (PlantAndGardenPlantings) -> Unit
 ) {
     val vm = PlantAndGardenPlantingsViewModel(plant)
 
@@ -192,6 +214,14 @@ private fun GardenListItem(
                     .padding(bottom = marginNormal),
                 style = MaterialTheme.typography.labelSmall
             )
+            IconButton(onClick = {
+                onRemovePlantClick(plant)
+            }) {
+                Icon(
+                    Icons.Filled.Clear,
+                    contentDescription = null
+                )
+            }
         }
     }
 }
