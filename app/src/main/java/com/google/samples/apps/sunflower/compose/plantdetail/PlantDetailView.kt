@@ -105,7 +105,7 @@ import com.google.samples.apps.sunflower.viewmodels.PlantDetailViewModel
  * parameters to not mix them up, they're aggregated in this class.
  */
 data class PlantDetailsCallbacks(
-    val onFabClick: () -> Unit,
+    val onAddToGardenClicked: () -> Unit,
     val onBackClick: () -> Unit,
     val onShareClick: (String) -> Unit,
     val onGalleryClick: (Plant) -> Unit
@@ -135,7 +135,7 @@ fun PlantDetailsScreen(
                     plantDetailsViewModel.hasValidUnsplashKey(),
                     PlantDetailsCallbacks(
                         onBackClick = onBackClick,
-                        onFabClick = {
+                        onAddToGardenClicked = {
                             plantDetailsViewModel.addPlantToGarden()
                         },
                         onShareClick = onShareClick,
@@ -224,7 +224,7 @@ fun PlantDetails(
                 // is released
                 maxOf(candidateHeight, 1.dp)
             },
-            onFabClick = callbacks.onFabClick,
+            onFabClick = callbacks.onAddToGardenClicked,
             onGalleryClick = { callbacks.onGalleryClick(plant) },
             contentAlpha = { contentAlpha.value }
         )
